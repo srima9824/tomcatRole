@@ -1,0 +1,62 @@
+---
+- name: Create tomcat group
+  group:
+    name: tomcat
+    system: true
+
+- name: Create tomcat user
+  user:
+    name: tomcat
+    group: tomcat
+    shell: /bin/false
+    home: /opt/tomcat
+
+- name: Download and extract Tomcat to tomcat home directory
+  unarchive:
+    src: "{{ tomcat_download_url }}"
+    dest: /tmp
+    remote_src: true
+    group: tomcat
+
+- name: copy files to opt tomcat
+  shell: cp -r /tmp/apache-tomcat-9.0.21/* /opt/tomcat
+
+- name: Change ownership
+  shell: chgrp -R tomcat /opt/tomcat
+  
+- name: Make the tomcat user the owner of the webapps, work, temp, and logs directories
+  file:
+    path: "/opt/tomcat/{{item}}"
+    owner: tomcat
+    group: tomcat
+    recurse: true
+  with_items:
+    - webapps
+    - work
+    - temp
+    - logs
+
+- name: Grant Tomcat group read access to the conf directory
+  file:
+    path: /opt/tomcat/conf
+    state: directory
+    mode: "g+r"
+    recurse: true
+
+- name: Grant Tomcat group execute access to the conf directory itself
+  file:
+    path: /opt/tomcat/conf
+    state: directory
+    mode: "g+x"
+
+- name: Create systemd service script for Tomcat
+  template:
+    src:  tomcat.service.j2
+    dest: /etc/systemd/system/tomcat.service
+
+- name: Start and enable Tomcat service
+  systemd:
+    name: tomcat
+    state: started
+    enabled: true
+    daemon_reload: true

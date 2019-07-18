@@ -1,0 +1,11 @@
+---
+# defaults file for tomcat
+jdk_version: openjdk-11-jdk
+home_directory: /opt/tomcat
+tomcat_group: tomcat
+tomcat_user: tomcat
+tomcat_download_url: http://mirrors.estointernet.in/apache/tomcat/tomcat-9/v9.0.21/bin/apache-tomcat-9.0.21.tar.gz
+JAVA_HOME: /usr/lib/jvm/java-11-openjdk-amd64
+
+tomcat_home_path: "/opt/tomcat"
+tomcat_archive_install_path: /opt/tomcat/apache-tomcat-9.0.21
